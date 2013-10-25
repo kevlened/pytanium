@@ -1,4 +1,4 @@
-import httplib
+import httplib, time, inspect
 import selenium.webdriver.remote.webdriver
 from pytanium_element import PytaniumElement
 
@@ -6,7 +6,10 @@ OldRemoteWebDriver = selenium.webdriver.remote.webdriver.WebDriver
 
 # Redefine the RemoteWebDriver
 class RemoteWebDriver(OldRemoteWebDriver):
-    def __init__(self, desired_capabilities = None, *args, **kwargs):
+    
+    # NOTE: Both desired_capabilities and capabilities have to be 
+    # defined due to inconsistencies in the Firefox WebDriver
+    def __init__(self, desired_capabilities = None, capabilities = None, *args, **kwargs):
         
         # Modify the existing WebElement identification functions
         oldfindelement = OldRemoteWebDriver.find_element
@@ -22,32 +25,43 @@ class RemoteWebDriver(OldRemoteWebDriver):
         # Allows you to inject a custom script on every page
         self.browser_js = ""
         
-        # Create the default pytanium capabilities        
-        capabilities = {'unexpectedAlertBehaviour' : 'ignore',
-                        'suppressAlerts' : True,
-                        'suppressConfirms' : True,
-                        'suppressPrompts' : True,
-                        'suppressPrint' : True,
+        # Create the default pytanium_capabilities        
+        pytanium_capabilities = {'unexpectedAlertBehaviour' : 'ignore',
+                        'suppressAlerts' : False,
+                        'suppressConfirms' : False,
+                        'suppressPrompts' : False,
+                        'suppressPrint' : False,
                         'enableRecorder' : False,
+                        'waitForAjax' : True,
+                        'waitForImages' : True,
                         'recorderHost' : 'localhost',
                         'recorderPort' : 9999
                         }        
         
         # If desired_capabilities were passed, update the defaults
-        if desired_capabilities:
+        if desired_capabilities and capabilities:
+            raise Exception("Both desired_capabilites or capabilities were passed to the WebDriver")
+        elif desired_capabilities:
             if type(desired_capabilities) is dict:
-                capabilities.update(desired_capabilities)
+                pytanium_capabilities.update(desired_capabilities)
             else:
                 raise Exception("desired_capabilities must be a dictionary")
+        elif capabilities:
+            if type(capabilities) is dict:
+                pytanium_capabilities.update(capabilities)
+            else:
+                raise Exception("capabilities must be a dictionary")
         
-        # Set the custom capabilities of pytanium
-        self.suppress_alerts = capabilities['suppressAlerts']
-        self.suppress_confirms = capabilities['suppressConfirms']
-        self.suppress_prompts = capabilities['suppressPrompts']
-        self.suppress_print = capabilities['suppressPrint']
-        self.enable_recorder = capabilities['enableRecorder']
-        self.recorder_host = capabilities['recorderHost']
-        self.recorder_port = capabilities['recorderPort']
+        # Set the custom pytanium_capabilities of pytanium
+        self.suppress_alerts = pytanium_capabilities['suppressAlerts']
+        self.suppress_confirms = pytanium_capabilities['suppressConfirms']
+        self.suppress_prompts = pytanium_capabilities['suppressPrompts']
+        self.suppress_print = pytanium_capabilities['suppressPrint']
+        self.wait_for_ajax = pytanium_capabilities['waitForAjax']
+        self.wait_for_images = pytanium_capabilities['waitForImages']
+        self.enable_recorder = pytanium_capabilities['enableRecorder']
+        self.recorder_host = pytanium_capabilities['recorderHost']
+        self.recorder_port = pytanium_capabilities['recorderPort']
         
         # If we're using the recorder, check the proxy
         if self.enable_recorder:
@@ -62,7 +76,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
                                         "autodetect":False
                                         }}
             
-            capabilities.update(extra_ie_capabilities)
+            pytanium_capabilities.update(extra_ie_capabilities)
             
         # Build accessors to help identify objects using Sahi's style
         self.accessors = []
@@ -70,7 +84,13 @@ class RemoteWebDriver(OldRemoteWebDriver):
         self.load_accessors()        
         
         # Build the old remote webdriver
-        OldRemoteWebDriver.__init__(self, desired_capabilities = desired_capabilities, *args, **kwargs)
+        if desired_capabilities:
+            OldRemoteWebDriver.__init__(self, desired_capabilities = pytanium_capabilities, *args, **kwargs)
+        elif capabilities:
+            # Firefox only
+            OldRemoteWebDriver.__init__(self, capabilities = pytanium_capabilities, *args, **kwargs)
+        else:
+            OldRemoteWebDriver.__init__(self, *args, **kwargs)
         
         # Set the default window as the first open window
         self.default_window = self.current_window_handle
@@ -86,7 +106,25 @@ class RemoteWebDriver(OldRemoteWebDriver):
         except Exception:
             raise Exception("The recorder proxy is not available. Please start Sahi on {0}:{1}.".format(self.recorder_host, self.recorder_port))
      
-         
+    def close_all(self):
+        for handle in self.window_handles:
+            self.switch_to_window(handle)
+            self.close()
+            
+    def get_alert(self):
+        a = self.switch_to_alert()
+        try:
+            a.text
+        except Exception:
+            print "There was no alert, confirm, or prompt found"
+            a = None
+        
+        return a
+    
+    alert = property(get_alert)
+    confirm = property(get_alert)
+    prompt = property(get_alert)
+    
     def addAD(self, accessor):
         self.accessors.append(accessor)
         self.accessors_name_set.add(accessor['name'])  
@@ -263,7 +301,159 @@ class RemoteWebDriver(OldRemoteWebDriver):
         return PytaniumElement(pytanium_parent = self, accessor_name = "imageSubmitButton", identifier = identifier, *args, **kwargs)
     
     def datebox(self, identifier, *args, **kwargs):
-        return PytaniumElement(pytanium_parent = self, accessor_name = "datebox", identifier = identifier, *args, **kwargs)    
+        return PytaniumElement(pytanium_parent = self, accessor_name = "datebox", identifier = identifier, *args, **kwargs)
+    
+    def select(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "select", identifier = identifier, *args, **kwargs)
+    
+    confirm_action = True
+    prompt_text = ""
+    
+    def inject_extensions(self):
+        # Inject javascript to supplement Selenium functionality
+        
+        if self.suppress_alerts:
+            alert = """  
+                // Backup the old alert
+                window.oldalert = window.oldalert || window.alert;
+                
+                // Override the window.alert
+                window.alert = function() {
+                    window.lastAlertText = arguments[0];
+                    return true;
+                };
+            """
+        else:
+            alert = """                
+                // Reset alert if it's been changed
+                window.alert = window.oldalert || window.alert;
+            """
+            
+        if self.suppress_confirms:
+            confirm = """
+                // Backup the old confirm
+                window.oldconfirm = window.oldconfirm || window.confirm;
+                
+                // Override the window.confirm
+                window.confirm = function() {
+                    window.lastConfirmText = arguments[0];
+                    return """ + str(self.confirm_action).lower() + """;
+                };
+            """
+        else:
+            confirm = """                
+                // Reset confirm if it's been changed
+                window.confirm = window.oldconfirm || window.confirm;
+            """
+        
+        if self.suppress_prompts:
+            prompt = """
+                // Backup the old prompt
+                window.oldprompt = window.oldprompt || window.prompt;
+                
+                // Override the window.prompt
+                window.prompt = function() {
+                    window.lastPromptText = arguments[0];
+                    return '""" + str(self.prompt_text) + """';
+                };
+            """
+        else:
+            prompt = """                
+                // Reset prompt if it's been changed
+                window.prompt = window.oldprompt || window.prompt;
+            """        
+        
+        if self.suppress_print:
+            print_override = """
+                // Backup the old print
+                window.print = window.oldprint || window.print;
+                
+                // Override the window.print
+                window.print = function() {
+                    window.printCalled = true;
+                    return true;
+                };
+            """
+        else:
+            print_override = """                
+                // Reset print if it's been changed
+                window.print = window.oldprint || window.print;
+            """
+            
+        #TODO: If an array of wait states is empty, then don't inject
+        if self.wait_for_ajax:
+            ajax = """
+                    // Create a list of XMLHttpRequests
+                    window.XHRs = window.XHRs || [];
+                    
+                    // Use the proxy pattern on open
+                    XMLHttpRequest.prototype.oldopen = XMLHttpRequest.prototype.oldopen || XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function(method, url, async, username, password){
+                        
+                        // Push the XHR to our global list
+                        window.XHRs.push(this);
+                        return this.oldopen.apply(this, arguments);
+                    };
+                    
+                    // Define a way to check if the requests are done
+                    window.pytaniumAjaxReady = function(){
+                        for(var XHR = 0; XHR < window.XHRs.length; XHR++){
+                            readyState = window.XHRs[XHR].readyState;
+                            if(readyState != 4){
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+            """
+        else:
+            ajax = """                
+                // Reset open if it's been changed
+                XMLHttpRequest.prototype.open = XMLHttpRequest.prototype.oldopen || XMLHttpRequest.prototype.open;
+            """
+        
+        script = alert + confirm + prompt + print_override + ajax + self.browser_js
+        self.execute_script(script)
+        
+    def is_ajax_complete(self):        
+        if self.wait_for_ajax:       
+            # Check if all the ajax requests are complete
+            javascript_check = self.execute_script("""
+                if(window.pytaniumAjaxReady){
+                    return window.pytaniumAjaxReady();
+                }
+                else{
+                    return true;
+                }
+            """)
+            return javascript_check
+        else:
+            return True
+    
+    def are_images_complete(self):
+        if self.wait_for_images:
+            
+            # Check if all the images are loaded
+            images = self.find_elements_by_tag_name("img")
+            
+            for image in images:
+                is_complete = image.get_attribute("complete")
+                if is_complete is None or is_complete == False:
+                    return False
+            
+        return True 
+    
+    def wait_until_load_complete(self):
+        timeout_limit = 30
+        timeout = time.time() + timeout_limit
+        interval = .5
+        while time.time() < timeout:
+            if self.is_ajax_complete() and self.are_images_complete():
+                return
+            
+            time.sleep(interval)
+        
+        raise Exception("Ajax requests and picture loads on the page took longer than " + timeout_limit + " seconds to execute")
 
 # Modify the base webdriver
 selenium.webdriver.remote.webdriver.WebDriver = RemoteWebDriver

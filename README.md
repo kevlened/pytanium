@@ -18,8 +18,8 @@ Features not listed below are assumed to be the same among the tools, ie. cross-
 |Prevent print | Doesn't block on print | No | Yes | No | Yes* |
 |AJAX waits | Waits for AJAX calls to complete | No | Yes | No | Yes* |
 |File downloads | Allows files to be saved | No | Yes | No | No |
-|Relational identifiers | Identify objects using in, near, contains etc| No | Yes | No | Yes |
-|Recorder/Object spy | Easy identification of elements | Yes | Yes | No | Yes |
+|Relational identifiers | Identify objects using in, near, contains etc| No | Yes | No | To do |
+|Recorder/Object spy | Easy identification of elements | Yes | Yes | No | To do |
 |Languages| Programming languages | Many | JavaScript/Java/Ruby | Ruby | Python |
 |Cross-domain support| Consistent cross-domain support | Yes | Occasional configuration | Yes | Yes |
 |Debugging | Breakpoints and introspection | Yes | Sort of** | Yes | Yes |
@@ -46,4 +46,4 @@ Pytanium's features are heavily inspired by Sahi, so a lot of Sahi's syntax work
 
 Recorder/Object spy
 -------------------
-Sahi has an excellent object spy and recorder. The pytanium recorder is a fork of Sahi Open Source with added pytanium support.
+Sahi has an excellent object spy and recorder. The pytanium recorder will be a fork of Sahi Open Source with added pytanium support.
