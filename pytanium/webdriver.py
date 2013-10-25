@@ -30,7 +30,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
                         'suppressAlerts' : False,
                         'suppressConfirms' : False,
                         'suppressPrompts' : False,
-                        'suppressPrint' : False,
+                        'suppressPrints' : False,
                         'enableRecorder' : False,
                         'waitForAjax' : True,
                         'waitForImages' : True,
@@ -56,7 +56,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
         self.suppress_alerts = pytanium_capabilities['suppressAlerts']
         self.suppress_confirms = pytanium_capabilities['suppressConfirms']
         self.suppress_prompts = pytanium_capabilities['suppressPrompts']
-        self.suppress_print = pytanium_capabilities['suppressPrint']
+        self.suppress_prints = pytanium_capabilities['suppressPrints']
         self.wait_for_ajax = pytanium_capabilities['waitForAjax']
         self.wait_for_images = pytanium_capabilities['waitForImages']
         self.enable_recorder = pytanium_capabilities['enableRecorder']
@@ -105,11 +105,6 @@ class RemoteWebDriver(OldRemoteWebDriver):
             
         except Exception:
             raise Exception("The recorder proxy is not available. Please start Sahi on {0}:{1}.".format(self.recorder_host, self.recorder_port))
-     
-    def close_all(self):
-        for handle in self.window_handles:
-            self.switch_to_window(handle)
-            self.close()
             
     def get_alert(self):
         a = self.switch_to_alert()
@@ -306,6 +301,9 @@ class RemoteWebDriver(OldRemoteWebDriver):
     def select(self, identifier, *args, **kwargs):
         return PytaniumElement(pytanium_parent = self, accessor_name = "select", identifier = identifier, *args, **kwargs)
     
+    def textarea(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "textarea", identifier = identifier, *args, **kwargs)
+    
     confirm_action = True
     prompt_text = ""
     
@@ -363,7 +361,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
                 window.prompt = window.oldprompt || window.prompt;
             """        
         
-        if self.suppress_print:
+        if self.suppress_prints:
             print_override = """
                 // Backup the old print
                 window.print = window.oldprint || window.print;
@@ -414,6 +412,30 @@ class RemoteWebDriver(OldRemoteWebDriver):
         
         script = alert + confirm + prompt + print_override + ajax + self.browser_js
         self.execute_script(script)
+    
+    def last_alert(self):
+        return self.execute_script("return window.lastAlertText;")
+    
+    def clear_last_alert(self):
+        return self.execute_script("window.lastAlertText = null;")
+
+    def print_called(self):
+        return self.execute_script("return window.printCalled || false;")
+    
+    def clear_print_called(self):
+        return self.execute_script("window.printCalled = false;")
+
+    def last_confirm(self):
+        return self.execute_script("return window.lastConfirmText;")
+    
+    def clear_last_confirm(self):
+        return self.execute_script("window.lastConfirmText = null;")
+    
+    def last_prompt(self):
+        return self.execute_script("return window.lastPromptText;")
+    
+    def clear_last_prompt(self):
+        return self.execute_script("window.lastPromptText = null;")
         
     def is_ajax_complete(self):        
         if self.wait_for_ajax:       
