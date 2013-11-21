@@ -298,11 +298,104 @@ class RemoteWebDriver(OldRemoteWebDriver):
     def datebox(self, identifier, *args, **kwargs):
         return PytaniumElement(pytanium_parent = self, accessor_name = "datebox", identifier = identifier, *args, **kwargs)
     
+    def datetimebox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "datetimebox", identifier = identifier, *args, **kwargs)
+    
+    def datetimelocalbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "datetimelocalbox", identifier = identifier, *args, **kwargs)
+        
+    def emailbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "emailbox", identifier = identifier, *args, **kwargs)
+            
+    def monthbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "monthbox", identifier = identifier, *args, **kwargs)
+            
+    def numberbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "numberbox", identifier = identifier, *args, **kwargs)
+                
+    def rangebox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "rangebox", identifier = identifier, *args, **kwargs)
+                
+    def searchbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "searchbox", identifier = identifier, *args, **kwargs)
+                
+    def telephonebox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "telephonebox", identifier = identifier, *args, **kwargs)
+                
+    def timebox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "timebox", identifier = identifier, *args, **kwargs)
+                
+    def urlbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "urlbox", identifier = identifier, *args, **kwargs)
+                
+    def weekbox(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "weekbox", identifier = identifier, *args, **kwargs)
+    
     def select(self, identifier, *args, **kwargs):
         return PytaniumElement(pytanium_parent = self, accessor_name = "select", identifier = identifier, *args, **kwargs)
+                
+    def option(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "option", identifier = identifier, *args, **kwargs)
     
     def textarea(self, identifier, *args, **kwargs):
         return PytaniumElement(pytanium_parent = self, accessor_name = "textarea", identifier = identifier, *args, **kwargs)
+            
+    def heading1(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading1", identifier = identifier, *args, **kwargs)
+                
+    def heading2(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading2", identifier = identifier, *args, **kwargs)
+                
+    def heading3(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading3", identifier = identifier, *args, **kwargs)
+                
+    def heading4(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading4", identifier = identifier, *args, **kwargs)
+                
+    def heading5(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading5", identifier = identifier, *args, **kwargs)
+                
+    def heading6(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "heading6", identifier = identifier, *args, **kwargs)
+                    
+    def area(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "area", identifier = identifier, *args, **kwargs)
+                    
+    def map(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "map", identifier = identifier, *args, **kwargs)
+                    
+    def paragraph(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "paragraph", identifier = identifier, *args, **kwargs)
+                    
+    def italic(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "italic", identifier = identifier, *args, **kwargs)
+                    
+    def emphasis(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "emphasis", identifier = identifier, *args, **kwargs)
+                    
+    def bold(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "bold", identifier = identifier, *args, **kwargs)
+                    
+    def strong(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "strong", identifier = identifier, *args, **kwargs)
+                    
+    def preformatted(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "preformatted", identifier = identifier, *args, **kwargs)
+                    
+    def code(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "code", identifier = identifier, *args, **kwargs)
+                    
+    def blockquote(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "blockquote", identifier = identifier, *args, **kwargs)
+                    
+    def canvas(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "canvas", identifier = identifier, *args, **kwargs)
+                    
+    def abbr(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "abbr", identifier = identifier, *args, **kwargs)
+                    
+    def hr(self, identifier, *args, **kwargs):
+        return PytaniumElement(pytanium_parent = self, accessor_name = "hr", identifier = identifier, *args, **kwargs)
     
     confirm_action = True
     prompt_text = ""
@@ -397,7 +490,9 @@ class RemoteWebDriver(OldRemoteWebDriver):
                     window.pytaniumAjaxReady = function(){
                         for(var XHR = 0; XHR < window.XHRs.length; XHR++){
                             readyState = window.XHRs[XHR].readyState;
-                            if(readyState != 4){
+                            
+                            // Remember that IE 8 doesn't have indexOf
+                            if([3,4].indexOf(readyState) < 0){
                                 return false;
                             }
                         }
@@ -475,7 +570,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
             
             time.sleep(interval)
         
-        raise Exception("Ajax requests and picture loads on the page took longer than " + timeout_limit + " seconds to execute")
+        raise Exception("Ajax requests and picture loads on the page took longer than " + str(timeout_limit) + " seconds to execute")
 
 # Modify the base webdriver
 selenium.webdriver.remote.webdriver.WebDriver = RemoteWebDriver
