@@ -12,15 +12,23 @@ class RemoteWebDriver(OldRemoteWebDriver):
     def __init__(self, desired_capabilities = None, capabilities = None, *args, **kwargs):
         
         # Modify the existing WebElement identification functions
-        oldfindelement = OldRemoteWebDriver.find_element
+        old_find_element = OldRemoteWebDriver.find_element
         
         def find_element(*args, **kwargs):
-            webelement = oldfindelement(*args, **kwargs)
+            webelement = old_find_element(*args, **kwargs)
             return PytaniumElement(selenium_element = webelement)
         
         OldRemoteWebDriver.find_element = find_element
         
-        # TODO: Override the ability to identify multiple elements
+        # Override the ability to identify multiple elements
+        old_find_elements = OldRemoteWebDriver.find_elements
+        
+        def find_elements(*args, **kwargs):
+            webelements = old_find_elements(*args, **kwargs)
+            webelements = [PytaniumElement(selenium_element = webelement) for webelement in webelements]
+            return webelements
+        
+        OldRemoteWebDriver.find_elements = find_elements
         
         # Allows you to inject a custom script on every page
         self.browser_js = ""
