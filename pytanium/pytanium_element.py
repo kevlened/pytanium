@@ -15,7 +15,7 @@ class PytaniumElement(WebElement):
         
         if selenium_element is None:
             self.uses_selenium_identifier = False
-            WebElement._parent = pytanium_parent
+            self._parent = pytanium_parent
             
             # If one wasn't passed, try to get the element
             self.get_selenium_element()
@@ -63,7 +63,7 @@ class PytaniumElement(WebElement):
     # Sahi
     def exists(self):
         
-        if WebElement._id:
+        if self._id:
             
             try:
                 self.tag_name
@@ -77,14 +77,14 @@ class PytaniumElement(WebElement):
             except StaleElementReferenceException:
                 self.get_selenium_element()
                 
-                if WebElement._id:
+                if self._id:
                     return True
                 else:
                     return False
         else:
             self.get_selenium_element()
             
-            if WebElement._id:
+            if self._id:
                 return True
             else:
                 return False
@@ -164,8 +164,8 @@ class PytaniumElement(WebElement):
     selected = property(get_selected, set_selected)
     
     def from_selenium_element(self, webelement):
-        WebElement._id = webelement._id
-        WebElement._parent = webelement._parent
+        self._id = webelement._id
+        self._parent = webelement._parent
     
     # Identify the selenium element id and parent
     def get_selenium_element(self):
@@ -401,5 +401,5 @@ class PytaniumElement(WebElement):
                         
                         return
                     
-        WebElement._id = None        
+        self._id = None        
         return 

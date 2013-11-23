@@ -20,8 +20,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
         
         OldRemoteWebDriver.find_element = find_element
         
-        # TODO: Override the ability to identify multiple elements
-        """
+        # Override the ability to identify multiple elements
         old_find_elements = OldRemoteWebDriver.find_elements
         
         def find_elements(*args, **kwargs):
@@ -30,7 +29,6 @@ class RemoteWebDriver(OldRemoteWebDriver):
             return webelements
         
         OldRemoteWebDriver.find_elements = find_elements
-        """
         
         # Allows you to inject a custom script on every page
         self.browser_js = ""
