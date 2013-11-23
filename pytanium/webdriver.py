@@ -20,7 +20,8 @@ class RemoteWebDriver(OldRemoteWebDriver):
         
         OldRemoteWebDriver.find_element = find_element
         
-        # Override the ability to identify multiple elements
+        # TODO: Override the ability to identify multiple elements
+        """
         old_find_elements = OldRemoteWebDriver.find_elements
         
         def find_elements(*args, **kwargs):
@@ -29,9 +30,13 @@ class RemoteWebDriver(OldRemoteWebDriver):
             return webelements
         
         OldRemoteWebDriver.find_elements = find_elements
+        """
         
         # Allows you to inject a custom script on every page
         self.browser_js = ""
+        
+        # Determines what XHR states should pause execution by default
+        self.xhr_wait_states = [1, 2, 3]
         
         # Create the default pytanium_capabilities        
         pytanium_capabilities = {'unexpectedAlertBehaviour' : 'ignore',
@@ -481,6 +486,11 @@ class RemoteWebDriver(OldRemoteWebDriver):
             
         #TODO: If an array of wait states is empty, then don't inject
         if self.wait_for_ajax:
+            
+            # Build the wait logic with booleans instead of indexOf
+            # because IE8 doesn't have indexOf by default 
+            wait_logic = ' == readyState || '.join(str(i) for i in self.xhr_wait_states) + ' == readyState'
+            
             ajax = """
                     // Create a list of XMLHttpRequests
                     window.XHRs = window.XHRs || [];
@@ -499,8 +509,7 @@ class RemoteWebDriver(OldRemoteWebDriver):
                         for(var XHR = 0; XHR < window.XHRs.length; XHR++){
                             readyState = window.XHRs[XHR].readyState;
                             
-                            // Remember that IE 8 doesn't have indexOf
-                            if([3,4].indexOf(readyState) < 0){
+                            if(""" + wait_logic + """){
                                 return false;
                             }
                         }

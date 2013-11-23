@@ -29,17 +29,19 @@ class PytaniumElement(WebElement):
         
         def _newexecute(command, *args, **kwargs):
             
-            if self._parent:
-                
-                # Inject javascript to supplement Selenium functionality
-                self._parent.inject_extensions()
-                
-                # Make sure it's ready to execute
-                self._parent.wait_until_load_complete()
-            
             # We use the tag name to check for existence
-            # If we don't skip the tag name, we have a loop
-            if not command == Command.GET_ELEMENT_TAG_NAME:
+            # We also get the attribute of images to see if they're complete
+            # If we don't exclude these two, we have a loop
+            if command not in [Command.GET_ELEMENT_TAG_NAME, Command.GET_ELEMENT_ATTRIBUTE]:
+                
+                if self._parent:
+                
+                    # Inject javascript to supplement Selenium functionality
+                    self._parent.inject_extensions()
+                    
+                    # Make sure it's ready to execute
+                    self._parent.wait_until_load_complete()
+                    
                 if self._id:         
                     
                     # Make sure the object even exists
@@ -325,7 +327,7 @@ class PytaniumElement(WebElement):
                                 else:
                                     # TODO: Figure out how we should replace characters with spaces
                                     # I think it should just be \n with spaces and trim the ends
-                                    if ident == str(node.text):
+                                    if ident == node.text:
                                         matches.append(node)
                                 
                                 continue
