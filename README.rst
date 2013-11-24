@@ -76,11 +76,34 @@ syntax works.
 Recorder/Object spy
 -------------------
 
-Sahi has an excellent object spy and recorder. The pytanium recorder
-will be a fork of Sahi Open Source with added pytanium support.
+Sahi has an excellent object spy and recorder. The pytanium recorder 
+leverages this power by simply adding an additional supported
+language to Sahi.
+
+`Download the recorder`_
+
+While writing automation, it's helpful to inspect objects on a page
+in the same browser instance we're automating. Opening another 
+browser just to verify an element on a page is cumbersome and slow.
+To use both the recorder and automation simultaneously:
+
+1. Start the Pytanium Recorder (A Sahi Open Source proxy)
+2. Pass {'enableRecorder' : True} as one of your capabilities (for Firefox) or desired_capabilities (for everything else)
+
+.. code-block:: python
+
+    from pytanium import webdriver
+    
+    # For Firefox
+    browser = Firefox(capabilities = {'enableRecorder' : True})
+    
+    # For everything else
+    browser = Chrome(desired_capabilities = {'enableRecorder' : True})
+    browser = Ie(desired_capabilities = {'enableRecorder' : True})
 
 .. _python binding for selenium: http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html
 .. _selenium with python: http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html
+.. _Download the recorder: https://github.com/kevlened/Sahi/releases/tag/v1.0
 
 License
 -------
