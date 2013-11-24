@@ -30,7 +30,7 @@ ie. cross-browser testing
 +-----------------------------------+-------------------------------------------------+------------+----------------------------+----------+------------+
 | Relational identifiers            | Identify objects using in, near, contains etc   | No         | Yes                        | No       | To do      |
 +-----------------------------------+-------------------------------------------------+------------+----------------------------+----------+------------+
-| Recorder/Object spy               | Easy identification of elements                 | Yes        | Yes                        | No       | To do      |
+| Recorder/Object spy               | Easy identification of elements                 | Yes        | Yes                        | No       | Yes        |
 +-----------------------------------+-------------------------------------------------+------------+----------------------------+----------+------------+
 | Languages                         | Programming languages                           | Many       | JavaScript/Java/Ruby       | Ruby     | Python     |
 +-----------------------------------+-------------------------------------------------+------------+----------------------------+----------+------------+
@@ -53,7 +53,7 @@ How
 Pytanium uses the `python binding for selenium`_. To provide the
 features not typically included with Selenium (AJAX waits, blocking
 print calls, etc), pytanium injects javascript on nearly every call to
-the browser. This doesn't have a noticeable impact on performance.
+the browser.
 
 Language Features
 -----------------
